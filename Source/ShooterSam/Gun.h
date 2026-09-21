@@ -32,4 +32,7 @@ public:
 	void PullTrigger();
 
 	AController* OwnerController;
+
+	UPROPERTY(EditAnywhere)
+	float MaxRange = 10000.0f;
 };
