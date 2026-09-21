@@ -78,6 +78,8 @@ void AShooterSamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 void AShooterSamCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OnTakeAnyDamage.AddDynamic(this,&AShooterSamCharacter::OnDamageTaken);
 	
 	GetMesh()->HideBoneByName("weapon_r",EPhysBodyOp::PBO_None);
 
@@ -155,4 +157,9 @@ void AShooterSamCharacter::Shoot()
 	if(Gun){
 		Gun->PullTrigger();
 	}
+}
+
+void AShooterSamCharacter::OnDamageTaken(AActor *DamagedActor, float Damage, const UDamageType *DamageType, AController *InstigatedBy, AActor *DamageCauser)
+{
+	UE_LOG(LogTemp,Display,TEXT("Damage Taken: %f"),Damage);
 }
