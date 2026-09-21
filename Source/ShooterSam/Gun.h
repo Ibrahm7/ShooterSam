@@ -31,4 +31,5 @@ public:
 
 	void PullTrigger();
 
+	AController* OwnerController;
 };
