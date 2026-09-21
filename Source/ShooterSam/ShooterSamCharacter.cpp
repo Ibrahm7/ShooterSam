@@ -75,6 +75,19 @@ void AShooterSamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
+void AShooterSamCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	GetMesh()->HideBoneByName("weapon_r",EPhysBodyOp::PBO_None);
+
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	if(Gun){
+		Gun->SetOwner(this);
+		Gun->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponSocket"));
+	}
+}
+
 void AShooterSamCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -137,5 +150,7 @@ void AShooterSamCharacter::DoJumpEnd()
 
 void AShooterSamCharacter::Shoot()
 {
-	UE_LOG(LogTemp,Display,TEXT("Shoot!"));
+	if(Gun){
+		Gun->PullTrigger();
+	}
 }
