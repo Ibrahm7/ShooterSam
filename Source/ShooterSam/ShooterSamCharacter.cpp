@@ -75,6 +75,23 @@ void AShooterSamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
+void AShooterSamCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OnTakeAnyDamage.AddDynamic(this,&AShooterSamCharacter::OnDamageTaken);
+	
+	GetMesh()->HideBoneByName("weapon_r",EPhysBodyOp::PBO_None);
+
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	if(Gun){
+		Gun->SetOwner(this);
+		Gun->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,TEXT("WeaponSocket"));
+
+		Gun->OwnerController = GetController();
+	}
+}
+
 void AShooterSamCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -137,5 +154,12 @@ void AShooterSamCharacter::DoJumpEnd()
 
 void AShooterSamCharacter::Shoot()
 {
-	UE_LOG(LogTemp,Display,TEXT("Shoot!"));
+	if(Gun){
+		Gun->PullTrigger();
+	}
+}
+
+void AShooterSamCharacter::OnDamageTaken(AActor *DamagedActor, float Damage, const UDamageType *DamageType, AController *InstigatedBy, AActor *DamageCauser)
+{
+	UE_LOG(LogTemp,Display,TEXT("Damage Taken: %f"),Damage);
 }
