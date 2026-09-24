@@ -3,14 +3,13 @@
 
 #include "ShooterAI.h"
 #include "Kismet/GameplayStatics.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 void AShooterAI::BeginPlay()
 {
     Super::BeginPlay();
 
-    if(EnemyAIBehaviorTree){
-        RunBehaviorTree(EnemyAIBehaviorTree);
-    }
+    
    
 }
 
@@ -30,4 +29,25 @@ void AShooterAI::Tick(float DeltaTime)
     //     }
 
     // }
+}
+
+void AShooterAI::StartBehaviorTree(AShooterSamCharacter *Player)
+{
+    if(EnemyAIBehaviorTree){
+
+        MyCharacter = Cast<AShooterSamCharacter>(GetPawn());
+
+        if(Player){
+            PlayerCharacter = Player;
+        }
+
+        RunBehaviorTree(EnemyAIBehaviorTree);
+
+       UBlackboardComponent* MyBlackboard = GetBlackboardComponent();
+
+       if(MyBlackboard && PlayerCharacter && MyCharacter){
+        MyBlackboard->SetValueAsVector("PlayerLocation",PlayerCharacter->GetActorLocation());
+        MyBlackboard->SetValueAsVector("StartLocation",MyCharacter->GetActorLocation());
+       }
+    }
 }
