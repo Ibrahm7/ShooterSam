@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "ShooterSam.h"
+#include "ShooterSamPlayerController.h"
 
 AShooterSamCharacter::AShooterSamCharacter()
 {
@@ -82,6 +83,7 @@ void AShooterSamCharacter::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this,&AShooterSamCharacter::OnDamageTaken);
 
 	Health = MaxHealth;
+	UpdateHUD();
 	
 	GetMesh()->HideBoneByName("weapon_r",EPhysBodyOp::PBO_None);
 
@@ -163,19 +165,31 @@ void AShooterSamCharacter::Shoot()
 
 void AShooterSamCharacter::OnDamageTaken(AActor *DamagedActor, float Damage, const UDamageType *DamageType, AController *InstigatedBy, AActor *DamageCauser)
 {
-	UE_LOG(LogTemp,Display,TEXT("Damage Taken: %f"),Damage);
 
 	if(isAlive){
 		Health -= Damage;
+		UpdateHUD();
+
 		if(Health <= 0.0f){
 			isAlive = false;
 			Health = 0.0f;
 
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			DetachFromControllerPendingDestroy();
-
-			UE_LOG(LogTemp,Display,TEXT("Character Died: %s"),*GetActorNameOrLabel());
-
 		}
+
+	}
+}
+
+void AShooterSamCharacter::UpdateHUD()
+{
+	AShooterSamPlayerController* PlayerController =Cast<AShooterSamPlayerController>(GetController());
+
+	if(PlayerController){
+		float NewPercent = Health/MaxHealth;
+		if((NewPercent) < 0.0f){
+			NewPercent = 0.0f;
+		}
+		PlayerController->HUDWidget->SetHealthBarPercent(NewPercent);
 	}
 }
